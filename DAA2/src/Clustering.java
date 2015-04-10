@@ -79,11 +79,11 @@ public class Clustering {
 			Edge edge = edges.get(count++);
 			
 			//Find the Leader given vertex
-			Leader from = find(edge.fromVertex);
-			Leader to = find(edge.toVertex);
+			Leader from = find2(edge.fromVertex);
+			Leader to = find2(edge.toVertex);
 			
 			if (from.leader != to.leader) {
-				union(from, to);
+				union2(from, to);
 				numOfClusters--;
 			}
 		}
@@ -115,6 +115,40 @@ public class Clustering {
 	}
 	
 	public Leader find(int vertex) {
+		return leaders[vertex];
+	}
+	
+	public void union2(Leader from, Leader to) {
+		Leader fromLeader = find2(from.leader);
+		Leader toLeader = find2(to.leader);
+		
+		int fromVertex = fromLeader.leader;
+		int toVertex = toLeader.leader;
+
+		int fromSize = fromLeader.size;
+		int toSize = toLeader.size;
+		
+		if(fromSize < toSize) {
+			leaders[fromVertex].leader = toVertex;
+			leaders[toVertex].size += leaders[fromVertex].size;
+		} else {
+			leaders[toVertex].leader = fromVertex;
+			leaders[fromVertex].size += leaders[toVertex].size;
+		}
+	}
+	
+	public Leader find2(int vertex) {
+		int node = vertex;
+		while(vertex != leaders[vertex].leader) {
+			vertex = leaders[vertex].leader;
+		}
+		
+		//update the pointer if necessary
+		while(node != leaders[node].leader) {
+			int tempLeader = leaders[node].leader;
+			leaders[node].leader = vertex;
+			node = tempLeader;
+		}
 		return leaders[vertex];
 	}
 
